@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+venv_tshirt/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 项目特定
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.bmp
+!demo/
+
+# 临时文件
+*.tmp
+*.log

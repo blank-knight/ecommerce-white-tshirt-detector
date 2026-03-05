@@ -19,15 +19,24 @@ echo ""
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
+# 检测操作系统并设置激活脚本路径
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+    # Windows (Git Bash/MSYS/Cygwin)
+    ACTIVATE_SCRIPT="venv_tshirt/Scripts/activate"
+else
+    # Linux/Unix
+    ACTIVATE_SCRIPT="venv_tshirt/bin/activate"
+fi
+
 # 检查虚拟环境
 if [ ! -d "venv_tshirt" ]; then
     echo -e "${YELLOW}⚠️  虚拟环境不存在，正在创建...${NC}"
     python3 -m venv venv_tshirt
-    source venv_tshirt/bin/activate
+    source "$ACTIVATE_SCRIPT"
     pip install opencv-python numpy --quiet
     echo -e "${GREEN}✅ 虚拟环境创建完成${NC}"
 else
-    source venv_tshirt/bin/activate
+    source "$ACTIVATE_SCRIPT"
     echo -e "${GREEN}✅ 虚拟环境已激活${NC}"
 fi
 

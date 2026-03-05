@@ -84,13 +84,13 @@ convert_path() {
         local drive="${path:0:1}"
         local rest="${path:2}"
 
-        # 转换反斜杠为正斜牌
-        rest=$(echo "$rest" | tr '\\' '/')
+        # 转换反斜杠为正斜杠
+        rest="${rest//\\//}"
 
         # 转换为 /c/Users/... 格式（Git Bash风格）或 /mnt/c/Users/... 格式（WSL风格）
         # 检测是否在WSL中
         if [[ -f /proc/version ]] && grep -qi microsoft /proc/version; then
-            echo "/mnt/$drive$rest"  # WSL格式
+            echo "/mnt/${drive,,}$rest"  # WSL格式
         else
             echo "/${drive,,}$rest"   # Git Bash格式（小写盘符）
         fi

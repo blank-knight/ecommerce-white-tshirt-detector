@@ -74,6 +74,32 @@ MAX_SATURATION=30
 MIN_RATIO=0.6
 FOCUS_RATIO=0.5
 
+# 转换Windows路径为Unix路径
+convert_path() {
+    local path="$1"
+
+    # 检测是否是Windows绝对路径 (C:\ 或 C:/)
+    if [[ "$path" =~ ^[A-Za-z]:[/\\] ]]; then
+        # 提取盘符和路径
+        local drive="${path:0:1}"
+        local rest="${path:2}"
+
+        # 转换反斜杠为正斜牌
+        rest=$(echo "$rest" | tr '\\' '/')
+
+        # 转换为 /c/Users/... 格式（Git Bash风格）或 /mnt/c/Users/... 格式（WSL风格）
+        # 检测是否在WSL中
+        if [[ -f /proc/version ]] && grep -qi microsoft /proc/version; then
+            echo "/mnt/$drive$rest"  # WSL格式
+        else
+            echo "/${drive,,}$rest"   # Git Bash格式（小写盘符）
+        fi
+    else
+        # 已经是Unix路径或相对路径，直接返回
+        echo "$path"
+    fi
+}
+
 # 显示当前参数
 show_params() {
     echo -e "${BLUE}当前参数设置：${NC}"
@@ -99,7 +125,9 @@ read -p "请输入选项 (1-6): " choice
 case $choice in
     1)
         echo ""
-        read -p "请输入图片目录路径: " input_dir
+        read -p "请输入图片目录路径: " input_dir_raw
+        input_dir=$(convert_path "$input_dir_raw")
+        echo -e "${BLUE}转换后的路径: $input_dir${NC}"
         if [ ! -d "$input_dir" ]; then
             echo -e "${RED}❌ 错误：目录不存在${NC}"
             exit 1
@@ -114,12 +142,15 @@ case $choice in
         ;;
     2)
         echo ""
-        read -p "请输入图片目录路径: " input_dir
+        read -p "请输入图片目录路径: " input_dir_raw
+        input_dir=$(convert_path "$input_dir_raw")
+        echo -e "${BLUE}转换后的路径: $input_dir${NC}"
         if [ ! -d "$input_dir" ]; then
             echo -e "${RED}❌ 错误：目录不存在${NC}"
             exit 1
         fi
-        read -p "请输入白色T恤输出目录: " output_dir
+        read -p "请输入白色T恤输出目录: " output_dir_raw
+        output_dir=$(convert_path "$output_dir_raw")
         echo ""
         echo -e "${BLUE}开始识别并保存...${NC}"
         python3 tshirt_color_detector.py "$input_dir" --output "$output_dir" \
@@ -130,12 +161,15 @@ case $choice in
         ;;
     3)
         echo ""
-        read -p "请输入图片目录路径: " input_dir
+        read -p "请输入图片目录路径: " input_dir_raw
+        input_dir=$(convert_path "$input_dir_raw")
+        echo -e "${BLUE}转换后的路径: $input_dir${NC}"
         if [ ! -d "$input_dir" ]; then
             echo -e "${RED}❌ 错误：目录不存在${NC}"
             exit 1
         fi
-        read -p "请输入白色T恤输出目录: " output_dir
+        read -p "请输入白色T恤输出目录: " output_dir_raw
+        output_dir=$(convert_path "$output_dir_raw")
         echo ""
         echo -e "${BLUE}开始自动分类...${NC}"
         python3 tshirt_color_detector.py "$input_dir" --output "$output_dir" --move \
@@ -146,7 +180,9 @@ case $choice in
         ;;
     4)
         echo ""
-        read -p "请输入要调试的图片路径: " image_path
+        read -p "请输入要调试的图片路径: " image_path_raw
+        image_path=$(convert_path "$image_path_raw")
+        echo -e "${BLUE}转换后的路径: $image_path${NC}"
         if [ ! -f "$image_path" ]; then
             echo -e "${RED}❌ 错误：文件不存在${NC}"
             exit 1

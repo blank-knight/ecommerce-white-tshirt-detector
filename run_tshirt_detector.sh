@@ -120,12 +120,12 @@ echo "5) ⚙️  高级设置（调整阈值参数）"
 echo "6) 📝 查看文档"
 echo ""
 show_params
-read -p "请输入选项 (1-6): " choice
+read -r -p "请输入选项 (1-6): " choice
 
 case $choice in
     1)
         echo ""
-        read -p "请输入图片目录路径: " input_dir_raw
+        read -r -p "请输入图片目录路径: " input_dir_raw
         input_dir=$(convert_path "$input_dir_raw")
         echo -e "${BLUE}转换后的路径: $input_dir${NC}"
         if [ ! -d "$input_dir" ]; then
@@ -142,14 +142,14 @@ case $choice in
         ;;
     2)
         echo ""
-        read -p "请输入图片目录路径: " input_dir_raw
+        read -r -p "请输入图片目录路径: " input_dir_raw
         input_dir=$(convert_path "$input_dir_raw")
         echo -e "${BLUE}转换后的路径: $input_dir${NC}"
         if [ ! -d "$input_dir" ]; then
             echo -e "${RED}❌ 错误：目录不存在${NC}"
             exit 1
         fi
-        read -p "请输入白色T恤输出目录: " output_dir_raw
+        read -r -p "请输入白色T恤输出目录: " output_dir_raw
         output_dir=$(convert_path "$output_dir_raw")
         echo ""
         echo -e "${BLUE}开始识别并保存...${NC}"
@@ -161,14 +161,14 @@ case $choice in
         ;;
     3)
         echo ""
-        read -p "请输入图片目录路径: " input_dir_raw
+        read -r -p "请输入图片目录路径: " input_dir_raw
         input_dir=$(convert_path "$input_dir_raw")
         echo -e "${BLUE}转换后的路径: $input_dir${NC}"
         if [ ! -d "$input_dir" ]; then
             echo -e "${RED}❌ 错误：目录不存在${NC}"
             exit 1
         fi
-        read -p "请输入白色T恤输出目录: " output_dir_raw
+        read -r -p "请输入白色T恤输出目录: " output_dir_raw
         output_dir=$(convert_path "$output_dir_raw")
         echo ""
         echo -e "${BLUE}开始自动分类...${NC}"
@@ -180,7 +180,7 @@ case $choice in
         ;;
     4)
         echo ""
-        read -p "请输入要调试的图片路径: " image_path_raw
+        read -r -p "请输入要调试的图片路径: " image_path_raw
         image_path=$(convert_path "$image_path_raw")
         echo -e "${BLUE}转换后的路径: $image_path${NC}"
         if [ ! -f "$image_path" ]; then
@@ -204,22 +204,22 @@ case $choice in
         echo "  - 提高 FOCUS_RATIO：包含更多背景（更宽松，但可能误判）"
         echo ""
 
-        read -p "当前 MIN_BRIGHTNESS = $MIN_BRIGHTNESS，新值 (0-255, 回车跳过): " new_val
+        read -r -p "当前 MIN_BRIGHTNESS = $MIN_BRIGHTNESS，新值 (0-255, 回车跳过): " new_val
         if [ ! -z "$new_val" ]; then
             MIN_BRIGHTNESS=$new_val
         fi
 
-        read -p "当前 MAX_SATURATION = $MAX_SATURATION，新值 (0-255, 回车跳过): " new_val
+        read -r -p "当前 MAX_SATURATION = $MAX_SATURATION，新值 (0-255, 回车跳过): " new_val
         if [ ! -z "$new_val" ]; then
             MAX_SATURATION=$new_val
         fi
 
-        read -p "当前 MIN_RATIO = $MIN_RATIO，新值 (0-1, 回车跳过): " new_val
+        read -r -p "当前 MIN_RATIO = $MIN_RATIO，新值 (0-1, 回车跳过): " new_val
         if [ ! -z "$new_val" ]; then
             MIN_RATIO=$new_val
         fi
 
-        read -p "当前 FOCUS_RATIO = $FOCUS_RATIO，新值 (0.1-1.0, 回车跳过): " new_val
+        read -r -p "当前 FOCUS_RATIO = $FOCUS_RATIO，新值 (0.1-1.0, 回车跳过): " new_val
         if [ ! -z "$new_val" ]; then
             FOCUS_RATIO=$new_val
         fi

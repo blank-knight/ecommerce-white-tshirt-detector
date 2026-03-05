@@ -1,6 +1,22 @@
 #!/bin/bash
 # T恤颜色识别器 - 一键运行脚本
 
+# 解析参数
+SKIP_VENV=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-venv|--skip-venv)
+            SKIP_VENV=true
+            shift
+            ;;
+        *)
+            echo "未知参数: $1"
+            echo "用法: bash run_tshirt_detector.sh [--no-venv]"
+            exit 1
+            ;;
+    esac
+done
+
 set -e  # 遇到错误立即退出
 
 # 颜色输出
@@ -14,6 +30,10 @@ echo -e "${BLUE}========================================"
 echo -e "   T恤颜色识别器 🎨"
 echo -e "========================================${NC}"
 echo ""
+if [ "$SKIP_VENV" = true ]; then
+    echo -e "${YELLOW}提示：正在使用系统Python（无虚拟环境）${NC}"
+    echo ""
+fi
 
 # 获取脚本所在目录
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -29,15 +49,21 @@ else
 fi
 
 # 检查虚拟环境
-if [ ! -d "venv_tshirt" ]; then
-    echo -e "${YELLOW}⚠️  虚拟环境不存在，正在创建...${NC}"
-    python3 -m venv venv_tshirt
-    source "$ACTIVATE_SCRIPT"
-    pip install opencv-python numpy --quiet
-    echo -e "${GREEN}✅ 虚拟环境创建完成${NC}"
+if [ "$SKIP_VENV" = true ]; then
+    echo -e "${YELLOW}⚠️  跳过虚拟环境，使用系统Python${NC}"
+    echo ""
 else
-    source "$ACTIVATE_SCRIPT"
-    echo -e "${GREEN}✅ 虚拟环境已激活${NC}"
+    if [ ! -d "venv_tshirt" ]; then
+        echo -e "${YELLOW}⚠️  虚拟环境不存在，正在创建...${NC}"
+        python3 -m venv venv_tshirt
+        source "$ACTIVATE_SCRIPT"
+        pip install opencv-python numpy --quiet
+        echo -e "${GREEN}✅ 虚拟环境创建完成${NC}"
+    else
+        source "$ACTIVATE_SCRIPT"
+        echo -e "${GREEN}✅ 虚拟环境已激活${NC}"
+    fi
+    echo ""
 fi
 
 echo ""

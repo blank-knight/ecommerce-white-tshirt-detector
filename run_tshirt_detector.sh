@@ -48,14 +48,28 @@ else
     ACTIVATE_SCRIPT="venv_tshirt/bin/activate"
 fi
 
+# 检查Python命令
+if command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+else
+    echo -e "${RED}❌ 错误：找不到Python命令${NC}"
+    exit 1
+fi
+
 # 检查虚拟环境
 if [ "$SKIP_VENV" = true ]; then
-    echo -e "${YELLOW}⚠️  跳过虚拟环境，使用系统Python${NC}"
+    echo -e "${YELLOW}⚠️  跳过虚拟环境，使用系统Python ($PYTHON_CMD)${NC}"
     echo ""
 else
     if [ ! -d "venv_tshirt" ]; then
         echo -e "${YELLOW}⚠️  虚拟环境不存在，正在创建...${NC}"
-        python3 -m venv venv_tshirt
+        $PYTHON_CMD -m venv venv_tshirt
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}❌ 虚拟环境创建失败${NC}"
+            exit 1
+        fi
         source "$ACTIVATE_SCRIPT"
         pip install opencv-python numpy --quiet
         echo -e "${GREEN}✅ 虚拟环境创建完成${NC}"
@@ -129,7 +143,7 @@ case $choice in
         fi
         echo ""
         echo -e "${BLUE}开始识别...${NC}"
-        python3 tshirt_color_detector.py "$input_dir" \
+        $PYTHON_CMD tshirt_color_detector.py "$input_dir" \
             --min-brightness "$MIN_BRIGHTNESS" \
             --max-saturation "$MAX_SATURATION" \
             --min-ratio "$MIN_RATIO" \
@@ -148,7 +162,7 @@ case $choice in
         output_dir=$(convert_path "$output_dir_raw")
         echo ""
         echo -e "${BLUE}开始识别并保存...${NC}"
-        python3 tshirt_color_detector.py "$input_dir" --output "$output_dir" \
+        $PYTHON_CMD tshirt_color_detector.py "$input_dir" --output "$output_dir" \
             --min-brightness "$MIN_BRIGHTNESS" \
             --max-saturation "$MAX_SATURATION" \
             --min-ratio "$MIN_RATIO" \
@@ -167,7 +181,7 @@ case $choice in
         output_dir=$(convert_path "$output_dir_raw")
         echo ""
         echo -e "${BLUE}开始自动分类...${NC}"
-        python3 tshirt_color_detector.py "$input_dir" --output "$output_dir" --move \
+        $PYTHON_CMD tshirt_color_detector.py "$input_dir" --output "$output_dir" --move \
             --min-brightness "$MIN_BRIGHTNESS" \
             --max-saturation "$MAX_SATURATION" \
             --min-ratio "$MIN_RATIO" \
@@ -184,7 +198,7 @@ case $choice in
         fi
         echo ""
         echo -e "${BLUE}生成可视化...${NC}"
-        python3 tshirt_color_detector.py --visualize "$image_path" \
+        $PYTHON_CMD tshirt_color_detector.py --visualize "$image_path" \
             --min-brightness "$MIN_BRIGHTNESS" \
             --max-saturation "$MAX_SATURATION"
         ;;

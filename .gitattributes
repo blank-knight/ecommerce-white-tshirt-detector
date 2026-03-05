@@ -1,0 +1,10 @@
+# 强制脚本文件使用LF换行符
+*.sh text eol=lf
+*.py text eol=lf
+
+# Git相关文件
+.gitattributes text eol=lf
+.gitignore text eol=lf
+
+# 文档文件
+*.md text eol=lf

@@ -256,6 +256,51 @@ python3 tshirt_color_detector.py /path/to/images \
 
 ### Windows用户
 
+#### 方式一：双击运行脚本（推荐）
+
+双击 `run_tshirt_detector.bat` 即可运行，菜单选项如下：
+
+```
+========================================
+   T-Shirt Color Detector
+========================================
+
+Please select an option:
+1) Quick scan (show results only)
+2) Save white t-shirts (copy to output folder)
+3) Auto classify (white/non-white separate)
+4) Debug mode (visualize white areas)
+5) Advanced settings (adjust threshold params)
+6) View documentation
+0) Exit
+
+Current parameters:
+  - MIN_BRIGHTNESS: 180 (0-255, lower = more lenient)
+  - MAX_SATURATION: 30 (0-255, higher = more lenient)
+  - MIN_RATIO: 0.6 (0-1, lower = more lenient)
+  - FOCUS_RATIO: 0.5 (0.1-1.0, higher = more background)
+```
+
+**菜单选项说明：**
+
+| 选项 | 功能 | 说明 |
+|------|------|------|
+| 1 | Quick scan | 快速扫描目录，只显示识别结果，不保存文件 |
+| 2 | Save white t-shirts | 将识别出的白色T恤复制到指定输出目录 |
+| 3 | Auto classify | 自动分类，白色T恤和非白色T恤分别保存到不同目录 |
+| 4 | Debug mode | 可视化白色区域，用于调试参数 |
+| 5 | Advanced settings | 调整阈值参数（亮度、饱和度、白色比例、中心区域比例） |
+| 6 | View documentation | 查看文档 |
+| 0 | Exit | 退出程序 |
+
+**参数调整提示：**
+- 降低 MIN_BRIGHTNESS 或提高 MAX_SATURATION → 更宽松（更容易识别为白色）
+- 提高 MIN_BRIGHTNESS 或降低 MAX_SATURATION → 更严格（只识别纯白）
+- 降低 MIN_RATIO → 允许白色区域更少（更宽松）
+- 提高 FOCUS_RATIO → 包含更多背景（可能误判）
+
+#### 方式二：命令行运行
+
 ```batch
 # 激活虚拟环境
 venv_tshirt\Scripts\activate

@@ -1,68 +1,116 @@
 @echo off
-REM T恤颜色识别器 - Windows一键运行脚本
+chcp 65001 >nul 2>&1
+setlocal enabledelayedexpansion
 
+set MIN_BRIGHTNESS=180
+set MAX_SATURATION=30
+set MIN_RATIO=0.6
+set FOCUS_RATIO=0.5
+
+:menu
+cls
 echo ========================================
-echo    T恤颜色识别器 🎨
+echo    T-Shirt Color Detector
 echo ========================================
 echo.
 
-REM 检查虚拟环境
-if not exist "venv_tshirt" (
-    echo [警告] 虚拟环境不存在，正在创建...
-    python -m venv venv_tshirt
-    call venv_tshirt\Scripts\activate
-    pip install opencv-python numpy
-    echo [完成] 虚拟环境创建完成
-) else (
-    call venv_tshirt\Scripts\activate
-    echo [完成] 虚拟环境已激活
-)
-
+echo Please select an option:
+echo 1) Quick scan (show results only)
+echo 2) Save white t-shirts (copy to output folder)
+echo 3) Auto classify (white/non-white separate)
+echo 4) Debug mode (visualize white areas)
+echo 5) Advanced settings (adjust threshold params)
+echo 6) View documentation
+echo 0) Exit
 echo.
-echo 请选择操作：
-echo 1) 快速识别（扫描目录，显示结果）
-echo 2) 保存白色T恤（复制到输出目录）
-echo 3) 自动分类（白色/非白色分开存放）
-echo 4) 调试模式（可视化白色区域）
-echo 5) 查看文档
+echo Current parameters:
+echo   - MIN_BRIGHTNESS: %MIN_BRIGHTNESS% (0-255, lower = more lenient)
+echo   - MAX_SATURATION: %MAX_SATURATION% (0-255, higher = more lenient)
+echo   - MIN_RATIO: %MIN_RATIO% (0-1, lower = more lenient)
+echo   - FOCUS_RATIO: %FOCUS_RATIO% (0.1-1.0, higher = more background)
 echo.
-set /p choice=请输入选项 (1-5): 
+set /p choice=Enter option (0-6): 
 
+if "%choice%"=="0" goto exit
 if "%choice%"=="1" goto quick_detect
 if "%choice%"=="2" goto save_white
 if "%choice%"=="3" goto auto_classify
 if "%choice%"=="4" goto debug_mode
-if "%choice%"=="5" goto show_doc
-echo [错误] 无效选项
-goto end
+if "%choice%"=="5" goto advanced_settings
+if "%choice%"=="6" goto show_doc
+echo [Error] Invalid option
+pause
+goto menu
 
 :quick_detect
-set /p input_dir=请输入图片目录路径: 
-python tshirt_color_detector.py "%input_dir%"
-goto end
+set /p input_dir=Enter image folder path: 
+python tshirt_color_detector.py "%input_dir%" --min-brightness %MIN_BRIGHTNESS% --max-saturation %MAX_SATURATION% --min-ratio %MIN_RATIO% --focus-ratio %FOCUS_RATIO%
+echo.
+pause
+goto menu
 
 :save_white
-set /p input_dir=请输入图片目录路径: 
-set /p output_dir=请输入白色T恤输出目录: 
-python tshirt_color_detector.py "%input_dir%" --output "%output_dir%"
-goto end
+set /p input_dir=Enter image folder path: 
+set /p output_dir=Enter output folder for white t-shirts: 
+python tshirt_color_detector.py "%input_dir%" --output "%output_dir%" --min-brightness %MIN_BRIGHTNESS% --max-saturation %MAX_SATURATION% --min-ratio %MIN_RATIO% --focus-ratio %FOCUS_RATIO%
+echo.
+pause
+goto menu
 
 :auto_classify
-set /p input_dir=请输入图片目录路径: 
-set /p output_dir=请输入白色T恤输出目录: 
-python tshirt_color_detector.py "%input_dir%" --output "%output_dir%" --move
-goto end
+set /p input_dir=Enter image folder path: 
+set /p output_dir=Enter output folder for white t-shirts: 
+python tshirt_color_detector.py "%input_dir%" --output "%output_dir%" --move --min-brightness %MIN_BRIGHTNESS% --max-saturation %MAX_SATURATION% --min-ratio %MIN_RATIO% --focus-ratio %FOCUS_RATIO%
+echo.
+pause
+goto menu
 
 :debug_mode
-set /p image_path=请输入要调试的图片路径: 
-python tshirt_color_detector.py --visualize "%image_path%"
-goto end
+set /p image_path=Enter image path to debug: 
+python tshirt_color_detector.py --visualize "%image_path%" --min-brightness %MIN_BRIGHTNESS% --max-saturation %MAX_SATURATION%
+echo.
+pause
+goto menu
+
+:advanced_settings
+echo.
+echo Advanced Settings - Adjust threshold parameters
+echo.
+echo Parameter tips:
+echo   - Lower MIN_BRIGHTNESS or higher MAX_SATURATION: more lenient (easier to detect as white)
+echo   - Higher MIN_BRIGHTNESS or lower MAX_SATURATION: stricter (only pure white)
+echo   - Lower MIN_RATIO: allow less white area (more lenient)
+echo   - Higher FOCUS_RATIO: include more background (may cause false positives)
+echo.
+
+set /p new_val=Current MIN_BRIGHTNESS = %MIN_BRIGHTNESS%, new value (0-255, press Enter to skip): 
+if not "%new_val%"=="" set MIN_BRIGHTNESS=%new_val%
+set new_val=
+
+set /p new_val=Current MAX_SATURATION = %MAX_SATURATION%, new value (0-255, press Enter to skip): 
+if not "%new_val%"=="" set MAX_SATURATION=%new_val%
+set new_val=
+
+set /p new_val=Current MIN_RATIO = %MIN_RATIO%, new value (0-1, press Enter to skip): 
+if not "%new_val%"=="" set MIN_RATIO=%new_val%
+set new_val=
+
+set /p new_val=Current FOCUS_RATIO = %FOCUS_RATIO%, new value (0.1-1.0, press Enter to skip): 
+if not "%new_val%"=="" set FOCUS_RATIO=%new_val%
+set new_val=
+
+echo.
+echo [Done] Parameters updated!
+echo.
+pause
+goto menu
 
 :show_doc
 type tshirt_detector_README.md
-goto end
-
-:end
 echo.
-echo [完成] 
 pause
+goto menu
+
+:exit
+echo.
+echo Goodbye!

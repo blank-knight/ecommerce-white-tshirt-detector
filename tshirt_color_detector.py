@@ -27,11 +27,38 @@ WHITE_UPPER = np.array([180, WHITE_MAX_SATURATION, 255])
 
 
 def load_image(image_path: str) -> np.ndarray:
-    """加载图片"""
-    img = cv2.imread(image_path)
-    if img is None:
-        raise ValueError(f"无法加载图片: {image_path}")
-    return img
+    """加载图片（支持中文路径）"""
+    try:
+        img = cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), cv2.IMREAD_COLOR)
+        if img is None:
+            raise ValueError(f"无法加载图片: {image_path}")
+        return img
+    except Exception as e:
+        raise ValueError(f"无法加载图片: {image_path}, 错误: {e}")
+
+
+def save_image(img: np.ndarray, image_path: str) -> bool:
+    """保存图片（支持中文路径）"""
+    try:
+        ext = Path(image_path).suffix.lower()
+        if ext in ['.jpg', '.jpeg']:
+            success, encoded = cv2.imencode('.jpg', img)
+        elif ext == '.png':
+            success, encoded = cv2.imencode('.png', img)
+        elif ext == '.webp':
+            success, encoded = cv2.imencode('.webp', img)
+        elif ext == '.bmp':
+            success, encoded = cv2.imencode('.bmp', img)
+        else:
+            success, encoded = cv2.imencode('.jpg', img)
+        
+        if success:
+            encoded.tofile(image_path)
+            return True
+        return False
+    except Exception as e:
+        print(f"保存图片失败: {image_path}, 错误: {e}")
+        return False
 
 
 def crop_center(img: np.ndarray, crop_ratio: float = FOCUS_CROP_RATIO) -> np.ndarray:
@@ -159,9 +186,8 @@ def process_images(
                 stats["white_files"].append(str(img_file))
 
                 if white_dir and move_non_white:
-                    # 保持白色T恤在原目录或移动到white_dir
                     new_path = white_dir / img_file.name
-                    cv2.imwrite(str(new_path), img)
+                    save_image(img, str(new_path))
 
                 if verbose:
                     print(f"✅ 白色: {img_file.name} (白色比例: {white_ratio:.2%})")
@@ -171,10 +197,8 @@ def process_images(
                 stats["non_white_files"].append(str(img_file))
 
                 if non_white_dir and move_non_white:
-                    # 移动非白色T恤
                     new_path = non_white_dir / img_file.name
-                    cv2.imwrite(str(new_path), img)
-                    # 删除原文件（可选）
+                    save_image(img, str(new_path))
                     # img_file.unlink()
 
                 if verbose:
@@ -215,7 +239,7 @@ def visualize_white_pixels(image_path: str, output_path: str = None):
     if output_path is None:
         output_path = image_path.replace('.', '_white_mask.')
 
-    cv2.imwrite(output_path, result)
+    save_image(result, output_path)
     print(f"白色区域可视化已保存到: {output_path}")
     print(f"裁剪区域大小: {cropped.shape}")
     print(f"白色像素比例: {white_ratio:.2%}")
